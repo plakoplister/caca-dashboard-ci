@@ -100,7 +100,39 @@ def load_real_volumes():
         st.error(f"Erreur: {e}")
         return None
 
+def check_authentication():
+    """Système d'authentification simple"""
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
+    
+    if not st.session_state.authenticated:
+        st.markdown('<h1 class="main-title">CACAO CÔTE D\'IVOIRE</h1>', unsafe_allow_html=True)
+        st.markdown('<p class="subtitle">Accès sécurisé au dashboard</p>', unsafe_allow_html=True)
+        
+        # Interface de connexion élégante
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("### 🔐 Authentification")
+            password = st.text_input("Code d'accès", type="password", placeholder="Entrez votre code")
+            
+            if st.button("Se connecter", use_container_width=True):
+                if password == "jo06v2":
+                    st.session_state.authenticated = True
+                    st.success("✅ Accès autorisé")
+                    st.rerun()
+                else:
+                    st.error("❌ Code d'accès incorrect")
+            
+            # Info de contact (optionnel)
+            st.markdown("---")
+            st.markdown("*Pour obtenir l'accès, contactez l'administrateur*")
+        
+        st.stop()
+
 def main():
+    # Vérification de l'authentification en premier
+    check_authentication()
+    
     # CSS élégant avec police professionnelle
     st.markdown("""
     <style>
@@ -182,6 +214,11 @@ def main():
     
     # Filtres
     st.sidebar.header("Filtres")
+    
+    # Bouton de déconnexion
+    if st.sidebar.button("🚪 Déconnexion", use_container_width=True):
+        st.session_state.authenticated = False
+        st.rerun()
     
     saisons = sorted([str(x) for x in df['SAISON'].unique() if pd.notna(x)])
     saison_selected = st.sidebar.selectbox("Saison", options=saisons, index=len(saisons)-1)
